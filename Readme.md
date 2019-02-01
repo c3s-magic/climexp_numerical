@@ -19,6 +19,8 @@ wget "http://opendap.knmi.nl/knmi/thredds/fileServer/climate_explorer/cru_ts3.22
 
 The data folder is mounted into the docker at /data/. Output is written to /data/out.nc
 ```
-docker run --ulimit stack=8277716992:8277716992 -ti -v `pwd`/data:/data -it climexp_numerical bash -c "/src/climexp/build/correlatefield /data/cru_ts3.22.1901.2013.pre.dat.nc /data/ersst_nino3.nc mon 1:12 ave 3 /data/out.nc"
+docker run --ulimit stack=827771699:827771699 -ti -v `pwd`/data:/data -it climexp_numerical bash -c "/src/climexp/build/correlatefield /data/cru_ts3.22.1901.2013.pre.dat.nc /data/nino3.nc mon 1:12 ave 3 /data/out.nc"
+ncview ./data/out.nc 
+
 ```
 
