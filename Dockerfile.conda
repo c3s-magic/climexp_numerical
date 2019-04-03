@@ -5,7 +5,7 @@ MAINTAINER KNMI <maarten.plieger@knmi.nl>
 
 # Conda dependencies
 RUN yum update -y && yum install -y \
-    bzip2 make m4
+    bzip2 make m4 git
 
 # Install conda
 RUN curl -L -O https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
@@ -24,7 +24,6 @@ ENV PKG_CONFIG_PATH /miniconda/lib/pkgconfig/
 ENV CPPFLAGS      "-I/miniconda/include -I/usr/include -I/build/include/ -I/build/include/fgsl/"
 ENV LDFLAGS       "-L/miniconda/lib -L/usr/lib -L/build/lib -L/build/lib -L/usr/lib64"
 ENV FORTRAN_FLAGS ${CPPFLAGS} ${LDFLAGS}
-ENV LD_LIBRARY_PATH "/miniconda/lib:/build/lib:$LD_LIBRARY_PATH"
 
 # Install fgsl from source, no conda available
 WORKDIR /src
@@ -41,4 +40,4 @@ COPY ./Docker/Makefile.docker /src/climexp/${PVM_ARCH}/Makefile
 RUN make
 
 
-#docker build -f Dockerfile.WPS -t test .
+#docker build -f Dockerfile.conda -t climexp_numerical_conda .
