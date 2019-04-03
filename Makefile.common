@@ -3,8 +3,6 @@
 .f90.o:
 	$(FC) $(FFLAGS)	 -c $<
 
-CPPFLAGS = -I/sw/include -I/usr/local/free/include
-
 VPATH		  = ../src
 
 MAKEFILE	  = Makefile ../Makefile.common
@@ -783,16 +781,16 @@ rocmap:		rocmap.o $(LIBRARY)
 		$(LD) $(FFLAGS) -o $@ $@.o $(LIBS)
 
 ROCscoremap:	ROCscoremap.o
-		$(CC) $(CFLAGS) -o $@ $@.o -L/sw/lib -L/usr/local/free/lib -lnetcdf
+		$(CC) $(CFLAGS) -o $@ $@.o $(LDFLAGS) -lnetcdf
 
 rocdeb: rocdeb.o
-		$(CC) $(CFLAGS) -o $@ $@.o -L/sw/lib -L/usr/local/free/lib -lnetcdf
+		$(CC) $(CFLAGS) -o $@ $@.o $(LDFLAGS) -lnetcdf
 
 RPS:		RPS.o
-		$(CC) $(CFLAGS) -o $@ $@.o -L/sw/lib -L/usr/local/free/lib -lnetcdf
+		$(CC) $(CFLAGS) -o $@ $@.o $(LDFLAGS) -lnetcdf
 
 Briar:		Briar.o
-		$(CC) $(CFLAGS) -o $@ $@.o -L/sw/lib -L/usr/local/free/lib -lnetcdf
+		$(CC) $(CFLAGS) -o $@ $@.o $(LDFLAGS) -lnetcdf
 
 # rkillfile.so:	rkillfile.f
 # 		R CMD SHLIB ../rkillfile.f

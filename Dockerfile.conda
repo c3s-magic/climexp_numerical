@@ -1,0 +1,44 @@
+FROM centos/devtoolset-7-toolchain-centos7:7
+USER root
+
+MAINTAINER KNMI <maarten.plieger@knmi.nl>
+
+# Conda dependencies
+RUN yum update -y && yum install -y \
+    bzip2 make m4
+
+# Install conda
+RUN curl -L -O https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
+RUN bash ./Miniconda2-latest-Linux-x86_64.sh -p /miniconda -b
+ENV PATH=/miniconda/bin:${PATH}
+RUN conda update -y conda
+RUN conda config --add channels conda-forge    
+
+#Install packages with conda
+RUN conda update -y conda && conda install -y \
+    netcdf-fortran \
+    gsl
+    
+# Set environment
+ENV PKG_CONFIG_PATH /miniconda/lib/pkgconfig/
+ENV CPPFLAGS      "-I/miniconda/include -I/usr/include -I/build/include/ -I/build/include/fgsl/"
+ENV LDFLAGS       "-L/miniconda/lib -L/usr/lib -L/build/lib -L/build/lib -L/usr/lib64"
+ENV FORTRAN_FLAGS ${CPPFLAGS} ${LDFLAGS}
+ENV LD_LIBRARY_PATH "/miniconda/lib:/build/lib:$LD_LIBRARY_PATH"
+
+# Install fgsl from source, no conda available
+WORKDIR /src
+RUN curl -L "https://doku.lrz.de/download/attachments/28051060/fgsl-1.2.0.tar.gz" > fgsl.tar.gz && tar -xzvf fgsl.tar.gz 
+RUN cd /src/fgsl-1.2.0 && ./configure --prefix /build && make && make install
+
+# Install climate explorer from source
+WORKDIR /src
+COPY . climexp
+ENV PVM_ARCH build
+WORKDIR /src/climexp/${PVM_ARCH}
+COPY ./Docker/Makefile.docker /src/climexp/${PVM_ARCH}/Makefile
+
+RUN make
+
+
+#docker build -f Dockerfile.WPS -t test .
