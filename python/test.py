@@ -3,13 +3,16 @@
 #logging.basicConfig(level=logging.DEBUG)
 from climexp_numerical import climexp_numerical
 import sys
+import os
+
 
 def callback(message):
   sys.stdout.write('[test correlatefield]: ' + message)
   sys.stdout.flush()
 
 climexp = climexp_numerical.ClimExp()
-climexp.setClimExpHome("../build")
+climexpBuild = os.getenv("CLIMATE_EXPLORER_BUILD", "../build")
+climexp.setClimExpHome(climexpBuild)
 status = climexp.correlatefield(
                      observation="../data/cru_ts3.22.1901.2013.pre.dat.nc",
                      model="../data/nino3.nc",

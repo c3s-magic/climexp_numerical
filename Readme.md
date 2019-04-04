@@ -24,3 +24,15 @@ ncview ./data/out.nc
 
 ```
 
+# Python wrapper Docker:
+
+A python wrapper for the correlatefield is available in the python folder.
+
+To build and run it using Docker, do:
+
+```
+docker build -f Dockerfile.conda -t climexp_numerical_conda .
+docker build -f Dockerfile.python -t climexp_numerical_python .
+docker run -ti -v `pwd`/data:/data -it climexp_numerical_python 
+ncview ./data/out.nc
+```

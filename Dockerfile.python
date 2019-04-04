@@ -1,0 +1,15 @@
+#docker build -f Dockerfile.conda -t climexp_numerical_conda .
+#docker build -f Dockerfile.python -t climexp_numerical_python .
+
+FROM climexp_numerical_conda
+USER root
+
+WORKDIR /src
+
+COPY ./python /src
+ENV LD_LIBRARY_PATH /miniconda/lib:/build/lib 
+ENV CLIMATE_EXPLORER_BUILD /src/climexp/build/
+
+CMD python test.py
+
+
