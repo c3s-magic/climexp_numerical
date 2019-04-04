@@ -35,10 +35,12 @@ def RunProcess(cmds,callback=None,env = None,bufsize=2):
   
   q = Queue()
   
-  stdoutThread = Thread(target=enqueue_output, args=(p.stdout, q), daemon = True)
+  stdoutThread = Thread(target=enqueue_output, args=(p.stdout, q))
+  stdoutThread.daemon = True;  
   stdoutThread.start()
   
-  stderrThread = Thread(target=enqueue_output, args=(p.stderr, q), daemon = True)
+  stderrThread = Thread(target=enqueue_output, args=(p.stderr, q))
+  stderrThread.daemon = True;  
   stderrThread.start()
   
   #http://stackoverflow.com/questions/156360/get-all-items-from-thread-queue

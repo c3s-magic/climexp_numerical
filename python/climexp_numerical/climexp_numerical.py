@@ -1,7 +1,7 @@
 import logging;
 import sys
 import os
-from climexp_numerical import RunProcess
+from . import RunProcess
 
 class ClimExp:
   def __init__(self):
