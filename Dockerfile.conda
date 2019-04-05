@@ -1,43 +1,43 @@
-FROM centos/devtoolset-7-toolchain-centos7:7
-USER root
+# vim:set ft=dockerfile:
+FROM continuumio/miniconda3
+MAINTAINER https://github.com/cp4cds/copernicus
+LABEL Description="Climate explorer Demo" Vendor="KNMI" Version="0.1.0"
 
-MAINTAINER KNMI <maarten.plieger@knmi.nl>
+# Update Debian system
+RUN apt-get update && apt-get install -y \
+ build-essential \
+ fonts-dejavu \
+&& rm -rf /var/lib/apt/lists/*
 
-# Conda dependencies
-RUN yum update -y && yum install -y \
-    bzip2 make m4 git
+# Update conda
+RUN conda update -n base conda
 
-# Install conda
-RUN curl -L -O https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh
-RUN bash ./Miniconda2-latest-Linux-x86_64.sh -p /miniconda -b
-ENV PATH=/miniconda/bin:${PATH}
-RUN conda update -y conda
-RUN conda config --add channels conda-forge    
+COPY environment.yml /opt/environment.yml
 
-#Install packages with conda
-RUN conda update -y conda && conda install -y \
-    netcdf-fortran \
-    gsl
-    
-# Set environment
-ENV PKG_CONFIG_PATH /miniconda/lib/pkgconfig/
-ENV CPPFLAGS      "-I/miniconda/include -I/usr/include -I/build/include/ -I/build/include/fgsl/"
-ENV LDFLAGS       "-L/miniconda/lib -L/usr/lib -L/build/lib -L/build/lib -L/usr/lib64"
-ENV FORTRAN_FLAGS ${CPPFLAGS} ${LDFLAGS}
+# Create conda environment
+RUN conda env create -n wps -f /opt/environment.yml
 
-# Install fgsl from source, no conda available
+# Install fgsl from source, no conda package available
 WORKDIR /src
+ENV MY_CONDA_ENV /opt/conda/envs/wps
+ENV gsl_CFLAGS "-I${MY_CONDA_ENV}/include"
+ENV gsl_LIBS   "-L${MY_CONDA_ENV}/lib"
 RUN curl -L "https://doku.lrz.de/download/attachments/28051060/fgsl-1.2.0.tar.gz" > fgsl.tar.gz && tar -xzvf fgsl.tar.gz 
-RUN cd /src/fgsl-1.2.0 && ./configure --prefix /build && make && make install
+RUN ["/bin/bash", "-c", "source activate wps && cd /src/fgsl-1.2.0 && ./configure --prefix ${MY_CONDA_ENV}/ && make && make install" ]
 
-# Install climate explorer from source
+# Install climate explorer from source, no conda package available
 WORKDIR /src
-COPY . climexp
+ENV CPPFLAGS      "-I${MY_CONDA_ENV}/include -I${MY_CONDA_ENV}/include/fgsl ${CPPFLAGS}"
+ENV LDFLAGS       "-L${MY_CONDA_ENV}/lib ${LDFLAGS}"
+ENV FORTRAN_FLAGS ${CPPFLAGS} ${LDFLAGS}
 ENV PVM_ARCH build
+ENV LD_LIBRARY_PATH ${MY_CONDA_ENV}:${LD_LIBRARY_PATH}
+COPY . climexp
 WORKDIR /src/climexp/${PVM_ARCH}
 COPY ./Docker/Makefile.docker /src/climexp/${PVM_ARCH}/Makefile
+RUN ["/bin/bash", "-c", "source activate wps && make" ]
 
-RUN make
+CMD bash
 
 
 #docker build -f Dockerfile.conda -t climexp_numerical_conda .

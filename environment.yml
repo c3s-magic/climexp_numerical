@@ -1,0 +1,8 @@
+name: copernicus
+channels:
+- conda-forge
+- defaults
+dependencies:
+- netcdf-fortran 
+- gsl
+- fortran-compiler 
