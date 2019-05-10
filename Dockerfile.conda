@@ -17,13 +17,23 @@ COPY environment.yml /opt/environment.yml
 # Create conda environment
 RUN conda env create -n wps -f /opt/environment.yml
 
-# Install fgsl from source, no conda package available
 WORKDIR /src
 ENV MY_CONDA_ENV /opt/conda/envs/wps
 ENV gsl_CFLAGS "-I${MY_CONDA_ENV}/include"
 ENV gsl_LIBS   "-L${MY_CONDA_ENV}/lib"
+
+# Climate explorer expects libblas, not libopenblas
+RUN ln -s /opt/conda/envs/wps/lib/libopenblas.so /opt/conda/envs/wps/lib/libblas.so
+
+# Compile fortran gsl
+WORKDIR /src
 RUN curl -L "https://doku.lrz.de/download/attachments/28051060/fgsl-1.2.0.tar.gz" > fgsl.tar.gz && tar -xzvf fgsl.tar.gz 
 RUN ["/bin/bash", "-c", "source activate wps && cd /src/fgsl-1.2.0 && ./configure --prefix ${MY_CONDA_ENV}/ && make && make install" ]
+
+# Compile fortran lapack, ensures that same fortran compiler is used as used to compile climate explorer
+WORKDIR /src
+RUN curl -L "http://www.netlib.org/lapack/lapack-3.8.0.tar.gz" > lapack-3.8.0.tar.gz && tar -xzvf lapack-3.8.0.tar.gz 
+RUN ["/bin/bash", "-c", "source activate wps && cd /src/lapack-3.8.0 && cp make.inc.example make.inc && make lapacklib && cp liblapack.a ${MY_CONDA_ENV}/lib " ]
 
 # Install climate explorer from source, no conda package available
 WORKDIR /src
