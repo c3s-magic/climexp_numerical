@@ -15,16 +15,18 @@ def callback(message):
 
 climexp = climexp_numerical.ClimExp()
 climexpBuild = os.getenv("CLIMATE_EXPLORER_BUILD", "../build")
+climexpData = os.getenv("CLIMATE_EXPLORER_DATA", "../data")
 climexp.setClimExpHome(climexpBuild)
-status = climexp.correlatefield(
-                     observation="../data/cru_ts3.22.1901.2013.pre.dat.nc",
-                     model="../data/nino3.nc",
-                     frequency="mon",
-                     timeselection="1:12",
-                     averaging="ave",
-                     lag=3,
-                     out="/tmp/out.nc",
-                     callback=callback
-                     )
+observationData = os.path.join(climexpData, "cru_ts3.22.1901.2013.pre.dat.nc")
+modelData = os.path.join(climexpData, "nino3.nc")
+status = climexp.correlatefield(observation=observationData,
+                                model=modelData,
+                                frequency="mon",
+                                timeselection="1:12",
+                                averaging="ave",
+                                lag=3,
+                                out="/tmp/out.nc",
+                                callback=callback
+                                )
 
 print("Status = %d" % status)
