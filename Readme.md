@@ -1,6 +1,13 @@
 # KNMI Climate explorer
 
-## Using climate explorer via Docker
+The KNMI climate explorer software can be used to do climate data analysis via a set of predefined climate data analysis functions.
+
+Available functions:
+1) Correlate field: Correlate field is a tool to correlate a field series to a point series to give fields of correlation coefficients, probabilities that these are significant, and the fit coefficients a, b and their errors.
+
+## Using the climate explorer via Docker
+
+Since the climate explorer code is written in Fortran, and has many dependencies, it can be difficult to compile and run the climate explorer on your workstation. To overcome this problem A docker image can be build containing the climate explorer tooling. The docker image allows you to build an isolated version and use the climate explorer on different environments. 
 
 ### The docker image can be build with the following command:
 ```
