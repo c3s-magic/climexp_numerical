@@ -4,6 +4,16 @@ The KNMI climate explorer software can be used to do climate data analysis via a
 
 Available functions:
 1) Correlate field: Correlate field is a tool to correlate a field series to a point series to give fields of correlation coefficients, probabilities that these are significant, and the fit coefficients a, b and their errors.
+   
+   Settings (see Python example below):
+   1) observation: Gridded observation dataset, like cru, example data is available [here](http://opendap.knmi.nl/knmi/thredds/fileServer/climate_explorer/cru_ts3.22.1901.2013.pre.dat.nc).
+   2) model: Timeseries of modeldata, like El Nino. Example data is available [here](http://opendap.knmi.nl/knmi/thredds/fileServer/climate_explorer/nino3.nc)
+   3) frequency: The time frequency, allowed value is at the moment "mon",
+   4) timeselection: Select which months you want to use, e.g "1:12" means January till December
+   5) averaging: The averaging method, currently "ave" is supported
+   6) lag: The time lag in the selected frequency, a lag of 3 means that the correlation of the two variables will be shifted with three months.
+   7) out="correlationresult.nc": The output filelocation and name
+   8) callback=callback: This is an optional callback function which can be used to print the progress and status of ongoing calculations. It is used to provide status to PyWPS.
 
 ## Using the climate explorer via Docker
 
@@ -19,7 +29,9 @@ docker build -t climexp_numerical .
 #### 1) First obtain data:
 ```
 mkdir ./data/
+# Retrieve model data:
 wget "http://opendap.knmi.nl/knmi/thredds/fileServer/climate_explorer/nino3.nc" -O ./data/nino3.nc
+# Retrieve observation data:
 wget "http://opendap.knmi.nl/knmi/thredds/fileServer/climate_explorer/cru_ts3.22.1901.2013.pre.dat.nc" -O ./data/cru_ts3.22.1901.2013.pre.dat.nc
 ```
 #### 2) Second run correlate field using the docker:
@@ -80,3 +92,7 @@ docker build -f Dockerfile.python -t climexp_numerical_python .
 docker run -ti -v `pwd`/data:/data -it climexp_numerical_python 
 ncview ./data/out.nc
 ```
+
+# Contributors
+
+© Copyright 2019: Geert Jan van Oldenborgh, Maarten Plieger
